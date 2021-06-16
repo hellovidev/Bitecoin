@@ -10,7 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    var coinManager = CoinManager()
+    fileprivate var coinManager = CoinManager()
     
     @IBOutlet weak var bitecoinLabel: UILabel!
     @IBOutlet weak var currencyLabel: UILabel!
@@ -18,12 +18,20 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        initDelegates()
+        prepareUI()
+    }
+    
+    private func prepareUI() {
+        if let selectedCurrency = coinManager.currencyArray.first {
+            coinManager.getCoinPrice(for: selectedCurrency)
+        }
+    }
+    
+    private func initDelegates() {
         coinManager.delegate = self
         currencyPicker.delegate = self
         currencyPicker.dataSource = self
-        
-        currencyLabel.text = coinManager.currencyArray.first
     }
 
 }
@@ -36,6 +44,7 @@ extension ViewController: UIPickerViewDataSource {
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return coinManager.currencyArray.count
     }
+    
 }
 
 extension ViewController: UIPickerViewDelegate {
@@ -47,6 +56,7 @@ extension ViewController: UIPickerViewDelegate {
         let selectedCurrency = coinManager.currencyArray[row]
         coinManager.getCoinPrice(for: selectedCurrency)
     }
+    
 }
 
 extension ViewController: CoinManagerDelegate {
@@ -60,6 +70,5 @@ extension ViewController: CoinManagerDelegate {
     func didFailWithError(error: Error) {
         print(error)
     }
-    
 
 }

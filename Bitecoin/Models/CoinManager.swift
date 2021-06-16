@@ -18,20 +18,21 @@ protocol CoinManagerDelegate {
     func didFailWithError(error: Error)
 }
 
-struct CoinManager {
-    private let baseURL = "https://rest.coinapi.io/v1/exchangerate/BTC"
-    private let apiKey = "853F2DE5-7F75-422C-9B3E-58B1FF2B098A"
-    
-    var delegate: CoinManagerDelegate?
-    
-    let currencyArray = ["AUD", "BRL","CAD","CNY","EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"]
+struct CoinAPI {
+    fileprivate static let baseURL = "https://rest.coinapi.io/v1/exchangerate/BTC"
+    fileprivate static let apiKey = "853F2DE5-7F75-422C-9B3E-58B1FF2B098A"
+}
 
+struct CoinManager {
+    var delegate: CoinManagerDelegate?
+    let currencyArray = ["AUD", "BRL","CAD","CNY","EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"]
+    
     func getCoinPrice(for currencyName: String) {
-        let urlString =  "\(baseURL)/\(currencyName)?apikey=\(apiKey)"
+        let urlString =  "\(CoinAPI.baseURL)/\(currencyName)?apikey=\(CoinAPI.apiKey)"
         performRequest(with: urlString)
     }
     
-    func performRequest(with urlString: String) {
+    private func performRequest(with urlString: String) {
         guard let url = URL(string: urlString) else { return }
         
         let session = URLSession(configuration: .default)
@@ -54,7 +55,7 @@ struct CoinManager {
         task.resume()
     }
     
-    func parseJSON(for currencyData: Data) -> CurrencyModel? {
+    private func parseJSON(for currencyData: Data) -> CurrencyModel? {
         let decoder = JSONDecoder()
         do {
             let currency = try decoder.decode(CurrencyModel.self, from: currencyData)
@@ -65,6 +66,4 @@ struct CoinManager {
         }
     }
     
-
-      //--header "X-CoinAPI-Key: 73034021-THIS-IS-SAMPLE-KEY"
 }
